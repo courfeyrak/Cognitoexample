@@ -14,6 +14,16 @@ async function signIn() {
     }
 }
 
+async function signInGoogle() {
+    try {
+        
+        const user=await Auth.federatedSignIn({provider: 'Google'});
+        console.log(user);
+    } catch (error) {
+        console.log('error signing in', error);
+    }
+}
+
 async function signUp() {
     try {
         var username="carlos";
@@ -37,7 +47,13 @@ async function signUp() {
 
 const MutationButton = document.getElementById("MutationEventButton");
 const adduserButton = document.getElementById("addUserEventButton");
+const Logingooglebt = document.getElementById("Logingooglebt");
 
+Logingooglebt.addEventListener("click", (evt) => {
+    signInGoogle().then((evt) => {
+      MutationResult.innerHTML += `<p>${evt.data.createTodo.name} - ${evt.data.createTodo.description}</p>`;
+    });
+  });
 
 MutationButton.addEventListener("click", (evt) => {
     signIn().then((evt) => {
