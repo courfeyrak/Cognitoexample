@@ -5,8 +5,8 @@ Amplify.configure(awsconfig);
 
 async function signIn() {
     try {
-        var username="carlos";
-        var password="Hgijrt89$";
+        var username="feralain";
+        var password="P4ssw0rd*1";
         const user = await Auth.signIn(username, password);
         console.log(user);
     } catch (error) {
