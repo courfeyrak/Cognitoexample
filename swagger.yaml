@@ -1,0 +1,263 @@
+openapi: 3.0.0
+info:
+  description: |
+    Token champions Api Definition
+  version: 1.0.0-oas3
+  title: Token Champions
+  termsOfService: http://tokenchampions.com/api/terms/
+  contact:
+    email: tokenchampionsapi@tokenchampions.com
+  license:
+    name: Token Champios all rigths reserved
+    url: http://www.tokenchampions.com/licenses/LICENSE-2.0.html
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/Xherstone3/demo/1.0.0
+  - url: https://petstore.swagger.io/v2
+tags:
+  - name: TokenyQualifications
+  - name: tokeny
+    description: Tokeny integration
+paths:
+  /tokeny/users:
+    post:
+      tags:
+        - tokeny
+      summary: Create a new user in tokeny
+      description: Create a new user in tokeny
+      operationId: addTokenyUser
+      security:
+        - bearer_auth: []
+      responses:
+        '201':
+          description: Success created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenyUser'
+        '401':
+          description: the user sent in the autorizarion does not have access
+        '409':
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenyError'
+  /tokeny/users/tat:
+    get:
+      tags:
+        - tokeny
+      summary: gets the Tokeny access token for the user
+      operationId: gettokenytat
+      security:
+        - bearer_auth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenyUserTaT'
+        '401':
+          description: the user sent in the autorizarion does not have access
+  /tokeny/users/qualifications:
+    get:
+      tags:
+        - TokenyQualifications
+      summary: gets the Tokeny estatus
+      operationId: gettokenytatq
+      security:
+        - bearer_auth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenyQualification'
+        '401':
+          description: the user sent in the autorizarion does not have access
+  /tokeny/users/qualifications/maindata:
+   get:
+      tags:
+        - TokenyQualifications
+      summary: Gets the user main data
+      description: Response will include all data coming from main-data section. You need to put bearer id_token in the Authorization header
+      operationId: gettokenymainData
+      security:
+        - bearer_auth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenyQualification'
+        '401':
+          description: the user sent in the autorizarion does not have access
+  /tokeny/servicing/tokens/holders:
+   get:
+      tags:
+        - Servicing
+      summary: Get investors qualification status and balance 
+      description: You need to send in the authorizarion header Bearer id_token and will return the qualificaiton status and balance of the user identified by the id_token
+      operationId: Signinserv
+      security:
+        - bearer_auth: []
+      responses:
+        '200':
+          description: Success created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenyUser'
+        '401':
+          description: the user sent in the autorizarion does not have access
+        '409':
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenyError'
+  /tokeny/servicing/tokens/candidate:
+   get:
+      tags:
+        - Servicing
+      summary: Get identity Id created and wallet selected during Qualification process
+      description: You need to send in the authorizarion header Bearer id_token and will return the identity Id created and wallet selected during Qualification process user identified by the id_token
+      operationId: Getholders
+      security:
+        - bearer_auth: []
+      responses:
+        '200':
+          description: Success created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenyUser'
+        '401':
+          description: the user sent in the autorizarion does not have access
+        '409':
+          description: User already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenyError'
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+components:
+  schemas:
+    TokenyQualification:
+      type: object
+      description: >-
+        If status does not exists (304) or status = recorded or registered, this
+        means investor has  never accessed qualification funnel or has not get
+        to the final of the funnel -> redirect to Tokenchampions qualification
+        funnel
+      properties:
+        allowedCountries:
+          type: array
+          items:
+            type: string
+        name:
+          type: string
+          description: always set to TokenyQualification
+        languages:
+          type: array
+          items:
+            type: string
+        investorPortalUrl:
+          type: string
+        milestones:
+          type: array
+          items:
+            type: string
+        progress:
+          type: integer
+        investorStatus:
+          type: string
+          description: >-
+            this means investor has got to the final of the funnel, so kyc check
+            is pending to be triggered or investor has already been kyc checked
+            -> proceed with the purchase flow (step 3).
+          enum:
+            - banned
+            - recorded
+            - registered
+            - pending
+            - approved
+            - authorized
+            - unauthorized
+            - revoked
+    TokenyData:
+      type: object
+      properties:
+        accountProviderId:
+          type: string
+        accountUserId:
+          type: string
+    TokenyError:
+      type: object
+      description: error message when a users already exists
+      properties:
+        error:
+          type: string
+        name:
+          type: string
+        data:
+          $ref: '#/components/schemas/TokenyData'
+    TokenyUserTaT:
+      type: object
+      properties:
+        token:
+          type: string
+          description: tokeny access token
+        issuedAt:
+          type: integer
+          description: Unix datetime
+        expiresIn:
+          type: integer
+          description: Unix datetime
+    TokenyUser:
+      type: object
+      properties:
+        providerId:
+          type: string
+          description: Cognito id token
+        sharedAccountId:
+          type: string
+          description: Cognito id token
+        UserId:
+          type: string
+        email:
+          type: string
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        type:
+          type: string
+        message:
+          type: string
+  requestBodies:
+    TokenyUser:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TokenyUser'
+      description: Pet object that needs to be added to the store
+      required: true
+  securitySchemes:
+    bearer_auth:
+      description: Aws id_token for the autenticated user.
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    bearer_authCCred:
+      description: Aws access token get by client credentials for the company (not user)
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
