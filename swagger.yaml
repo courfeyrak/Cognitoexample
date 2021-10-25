@@ -11,9 +11,8 @@ info:
     name: Token Champios all rigths reserved
     url: http://www.tokenchampions.com/licenses/LICENSE-2.0.html
 servers:
-  - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/Xherstone3/demo/1.0.0
-  - url: https://petstore.swagger.io/v2
+  - description: DevEnv
+    url: https://exbfyipti5.execute-api.us-east-1.amazonaws.com
 tags:
   - name: TokenyQualifications
   - name: tokeny
@@ -43,24 +42,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TokenyError'
-  /tokeny/users/tat:
-    get:
-      tags:
-        - tokeny
-      summary: gets the Tokeny access token for the user
-      operationId: gettokenytat
-      security:
-        - bearer_auth: []
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TokenyUserTaT'
-        '401':
-          description: the user sent in the autorizarion does not have access
-  /tokeny/users/qualifications:
+  /tokeny/users/qualifications/status:
     get:
       tags:
         - TokenyQualifications
@@ -78,12 +60,25 @@ paths:
         '401':
           description: the user sent in the autorizarion does not have access
   /tokeny/users/qualifications/maindata:
-   get:
+    get:
       tags:
         - TokenyQualifications
-      summary: Gets the user main data
-      description: Response will include all data coming from main-data section. You need to put bearer id_token in the Authorization header
-      operationId: gettokenymainData
+      summary: Get identity Id created and wallet selected during Qualification process
+      security:
+        - bearer_auth: []
+      responses:
+        '206':
+          description: Partial Content
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenyMainData'
+  /tokeny/users/tat:
+    get:
+      tags:
+        - tokeny
+      summary: gets the Tokeny access token for the user
+      operationId: gettokenytat
       security:
         - bearer_auth: []
       responses:
@@ -92,57 +87,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TokenyQualification'
+                $ref: '#/components/schemas/TokenyUserTaT'
         '401':
           description: the user sent in the autorizarion does not have access
-  /tokeny/servicing/tokens/holders:
-   get:
-      tags:
-        - Servicing
-      summary: Get investors qualification status and balance 
-      description: You need to send in the authorizarion header Bearer id_token and will return the qualificaiton status and balance of the user identified by the id_token
-      operationId: Signinserv
-      security:
-        - bearer_auth: []
-      responses:
-        '200':
-          description: Success created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TokenyUser'
-        '401':
-          description: the user sent in the autorizarion does not have access
-        '409':
-          description: User already exists
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TokenyError'
-  /tokeny/servicing/tokens/candidate:
-   get:
-      tags:
-        - Servicing
-      summary: Get identity Id created and wallet selected during Qualification process
-      description: You need to send in the authorizarion header Bearer id_token and will return the identity Id created and wallet selected during Qualification process user identified by the id_token
-      operationId: Getholders
-      security:
-        - bearer_auth: []
-      responses:
-        '200':
-          description: Success created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TokenyUser'
-        '401':
-          description: the user sent in the autorizarion does not have access
-        '409':
-          description: User already exists
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TokenyError'
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
@@ -190,6 +137,55 @@ components:
             - authorized
             - unauthorized
             - revoked
+    TokenyMainData:
+      type: object
+      description: >-
+        identity Id created and wallet selected during Qualification process
+      properties:
+        id: 
+          type: string
+        label: 
+          type: string
+        status: 
+          type: string
+        elements: 
+          type: array
+          items: 
+            type: object
+            properties: 
+              fields: 
+                type: array
+                items: 
+                  type: object
+                  properties: 
+                    id: 
+                      type: string
+                    type: 
+                      type: string
+                    label: 
+                      type: string
+                    value: 
+                      type: string
+                    helperText: 
+                      type: string
+                    required: 
+                      type: boolean
+                    standard: 
+                      type: boolean
+              id: 
+                type: string
+              layout: 
+                type: string
+              legend: 
+                type: string
+              type: 
+                type: string
+        warnOnUpdate: 
+          type: boolean
+        instructions: 
+          type: string
+
+        
     TokenyData:
       type: object
       properties:
@@ -250,14 +246,18 @@ components:
             $ref: '#/components/schemas/TokenyUser'
       description: Pet object that needs to be added to the store
       required: true
+    UserArray:
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/TokenyUser'
+      description: List of user object
+      required: true
   securitySchemes:
     bearer_auth:
       description: Aws id_token for the autenticated user.
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
-    bearer_authCCred:
-      description: Aws access token get by client credentials for the company (not user)
       type: http
       scheme: bearer
       bearerFormat: JWT
