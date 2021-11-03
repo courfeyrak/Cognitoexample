@@ -13,8 +13,8 @@ const awsconfig = {
             "profile",
             "aws.cognito.signin.user.admin"
         ],
-        "redirectSignIn"  : "http://tokenchampions.test/home",
-        "redirectSignOut" : "http://tokenchampions.test/home",
+        "redirectSignIn"  : "http://localhost:8080/",
+        "redirectSignOut" : "http://localhost:8080/",
         "responseType"    : "code"
     },
     "federationTarget": "COGNITO_USER_POOLS",

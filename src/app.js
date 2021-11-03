@@ -4,7 +4,7 @@ Amplify.configure(awsconfig);
 
 async function confirmSignUp() {
     var username="carlos.gtz.cg@gmail.com"; //<- se confirma con el username
-    var code="988262";
+    var code="509081";
     try {
       await Auth.confirmSignUp(username, code);
     } catch (error) {
@@ -26,7 +26,14 @@ async function signIn() {
 async function signInGoogle() {
     try {
         
-        const user=await Auth.federatedSignIn({provider: 'Google'});
+        const user=await Auth.federatedSignIn({provider: 'Google'}).
+        then(cred => {
+          // If success, you will get the AWS credentials
+          localStorage.setItem('cred',JSON.stringify(cred));
+          
+          return Auth.currentAuthenticatedUser();
+        });
+        localStorage.setItem('user',JSON.stringify(user));
         console.log(user);
     } catch (error) {
         console.log('error signing in', error);
@@ -36,16 +43,22 @@ async function signInGoogle() {
 async function signUp() {
     try {
         var username="carlos.gtz.cg@gmail.com"; // mismo que el mail el username
-        var password="Hgijrt89$";
+        var password="H2dfasdf$";
         var email="carlos.gtz.cg@gmail.com";
         var phone_number="";
+        var name="Carlos"
+        var middle_name="Alberto"
+        var family_name="gutierrez";
+        
         const { user } = await Auth.signUp({
             username,  //usar el mismo mail como user
             password,
             attributes: {
                 email,          // optional
                 phone_number,   // optional - E.164 number convention
-                // other custom attributes 
+                name,
+                family_name,// other custom attributes 
+                middle_name
             }
         });
         console.log(user);
