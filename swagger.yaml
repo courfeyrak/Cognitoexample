@@ -15,16 +15,192 @@ servers:
     url: https://exbfyipti5.execute-api.us-east-1.amazonaws.com
 tags:
   - name: TokenyQualifications
-  - name: tokeny
     description: Tokeny integration
 paths:
+  /tokeny/servicing/actions/mint/batch:
+    post:
+      tags:
+        - TokenyServicing
+      summary: Mint tokens
+      operationId: TokenyServicingMintTokens 
+      requestBody: 
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenyMintTokenReq'
+      security:
+        - bearer_auth: []
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenyMintTokenBatchRes'
+  /tokeny/servicing/actions/mint/validate:
+    post:
+      tags:
+        - TokenyServicing
+      summary: Optionally there is a validation endpoint  that can be called before mint one to make sure parameters are correct by calling
+      operationId: TokenyValidateMint  
+      requestBody: 
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenyMintTokenReq'
+      security:
+        - bearer_auth: []
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenyMintValidateRes'
+  /tokeny/servicing/actions/unfreeze/batch:
+    post:
+      tags:
+        - TokenyServicing
+      summary: unfreeze tokens
+      operationId: TokenyUnFreezeTokens  
+      requestBody: 
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenyMintTokenReq'
+      security:
+        - bearer_auth: []
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenyMintValidateRes'
+  /tokeny/servicing/actions/burn/batch:
+    post:
+      tags:
+        - TokenyServicing
+      summary: burn tokens
+      operationId: TokenyBurnTokens   
+      requestBody: 
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenyMintTokenReq'
+      security:
+        - bearer_auth: []
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenyMintValidateRes'
+  /tokeny/servicing/actions/freeze/batch:
+    post:
+      tags:
+        - TokenyServicing
+      summary: freeze tokens
+      operationId: TokenyFreezeTokens   
+      requestBody: 
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenyMintTokenReq'
+      security:
+        - bearer_auth: []
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenyMintValidateRes'
+  /tokeny/servicing/transactions:
+    get:
+      tags:
+        - TokenyServicing
+      summary: transactions
+      operationId: TokenyMintTransactions
+      security:
+        - bearer_auth: []
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenyTransactionsRes'
+  /tokeny/servicing/holders:
+    get:
+      tags:
+        - TokenyServicing
+      summary: TokenyQualificationsGetInvStatusBalance 
+      operationId: TokenyQualificationsGetInvStatusBalance 
+      security:
+        - bearer_auth: []
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenyHolders'
+  /tokeny/servicing/holders/whitelist:
+    post:
+      tags:
+        - TokenyServicing
+      summary: Trigger Qualification process
+      operationId: TokenyServicingQualificationProcess 
+      requestBody: 
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenyCandidatesOnfidoReq'
+      security:
+        - bearer_auth: []
+      responses:
+        '204':
+          description: No Content
+  /tokeny/servicing/candidates:
+      get:
+        tags:
+          - TokenyServicing
+        summary: Get identity Id created and wallet selected during Qualification process
+        operationId: TokenyServicingGetCandidates 
+        security:
+          - bearer_auth: []
+        responses:
+          '206':
+            description: Partial Content
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/TokenyCandidates'
+  /tokeny/servicing/candidates/onfido-check:
+    post:
+      tags:
+        - TokenyServicing
+      summary: To trigger Onfido check
+      operationId: TokenyServicingTriggerOnfidoCheck 
+      requestBody: 
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenyCandidatesOnfidoReq'
+      security:
+        - bearer_auth: []
+      responses:
+        '204':
+          description: No Content
   /tokeny/users:
     post:
       tags:
         - tokeny
       summary: Create a new user in tokeny
       description: Create a new user in tokeny
-      operationId: addTokenyUser
+      operationId: TokenyCreateUser 
       security:
         - bearer_auth: []
       responses:
@@ -42,12 +218,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TokenyError'
+  /tokeny/users/tat:
+    get:
+      tags:
+        - tokeny
+      summary: gets the Tokeny access token for the user
+      operationId: TokenyGetTaT
+      security:
+        - bearer_auth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenyUserTaT'
+        '401':
+          description: the user sent in the autorizarion does not have access
   /tokeny/users/qualifications/status:
     get:
       tags:
         - TokenyQualifications
       summary: gets the Tokeny estatus
-      operationId: gettokenytatq
+      operationId: TokenyQualificationsGetInvStatus
       security:
         - bearer_auth: []
       responses:
@@ -64,6 +257,7 @@ paths:
       tags:
         - TokenyQualifications
       summary: Get identity Id created and wallet selected during Qualification process
+      operationId: TokenyQualificationsGetInvMainData 
       security:
         - bearer_auth: []
       responses:
@@ -73,28 +267,361 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TokenyMainData'
-  /tokeny/users/tat:
-    get:
-      tags:
-        - tokeny
-      summary: gets the Tokeny access token for the user
-      operationId: gettokenytat
-      security:
-        - bearer_auth: []
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TokenyUserTaT'
-        '401':
-          description: the user sent in the autorizarion does not have access
+
 externalDocs:
   description: Find out more about Swagger
   url: http://swagger.io
 components:
   schemas:
+    TokenyTransactionsRes:
+      type: object
+      properties: 
+        items: 
+          type: array
+          items: 
+            type: object
+            properties: 
+              type: 
+                type: string
+                example: burn
+              id: 
+                type: string
+                example: 0xa2522cb9a7917b2f14a350308856d4a9abb2688588b436cf6b960ee409b41227-0x0d37d9e06329111fb2e8b63e7a22142e80c26622-0x0000000000000000000000000000000000000000-0
+              datetime: 
+                type: string
+                example: 2021-10-27T01:12:40.000Z
+              amount: 
+                type: string
+                example: 1
+              transactionHash: 
+                type: string
+                example: 0xa2522cb9a7917b2f14a350308856d4a9abb2688588b436cf6b960ee409b41227
+              sender: 
+                type: object
+                properties: 
+                  wallet: 
+                    type: string
+                    example: 0x0d37d9e06329111fb2e8b63e7a22142e80c26622
+                  balance: 
+                    type: string
+                    example: 96
+                  frozenBalance: 
+                    type: string
+                    example: 1
+                  unfrozenBalance: 
+                    type: string
+                    example: 95
+                  isWalletFrozen: 
+                    type: boolean
+                  details: 
+                    type: object
+                    properties: 
+                      message: 
+                        type: string
+                        example: The holder is not registered or you are missing access rights to read its information.
+              recipient: 
+                type: object
+                properties: 
+                  wallet: 
+                    type: string
+                    example: 0x0000000000000000000000000000000000000000
+                  details: 
+                    type: object
+                    properties: 
+                      message: 
+                        type: string
+                        example: The holder is not registered or you are missing access rights to read its information.
+              totalSupplyAfter: 
+                type: string
+                example: 317
+              status: 
+                type: string
+                example: CONFIRMED
+        itemsReturned: 
+          type: integer
+          format: int32
+          example: 20
+        totalItemsFound: 
+          type: integer
+          format: int32
+          example: 48
+        totalPagesFound: 
+          type: integer
+          format: int32
+          example: 3
+        firstPageOffset: 
+          type: integer
+          format: int32
+          example: 0
+        lastPageOffset: 
+          type: integer
+          format: int32
+          example: 40
+        currentPage: 
+          type: integer
+          format: int32
+          example: 1
+        previousPageOffset: 
+          type: string
+          format: nullable
+        nextPageOffset: 
+          type: integer
+          format: int32
+          example: 20
+    TokenyHolders:
+      type: object
+      properties: 
+        items: 
+          type: array
+          items: 
+            type: object
+            properties: 
+              id: 
+                type: string
+                example: 51e9a67d-c802-41ce-8518-ed69480cb4e5
+              typeOfInvestor: 
+                type: string
+                example: individual
+              email: 
+                type: string
+                example: antoniusproximo@outlook.com
+              identityAddress: 
+                type: string
+                example: 0xac77abbfe822db8316a131571c145ff09055a308
+              identityId: 
+                type: string
+                example: 57a64aa3-3c67-4eee-bcd6-b519d8f2b40d
+              wallet: 
+                type: string
+                example: 0x09f05d5213de4b3d35788271c561f82062b5ecda
+              provider: 
+                type: string
+                example: USER_MANAGED
+              identityAuthorized: 
+                type: boolean
+              status: 
+                type: string
+                example: TokenHolder
+              balance: 
+                type: string
+                example: 150
+              frozenBalance: 
+                type: string
+                example: 100
+              unfrozenBalance: 
+                type: string
+                example: 50
+              isWalletFrozen: 
+                type: boolean
+              decimals: 
+                type: integer
+                format: int32
+                example: 0
+              lastTransaction: 
+                type: string
+                example: 1634855714
+              country: 
+                type: string
+                example: LIE
+              investor: 
+                type: string
+                example: Antonio Pedraza
+              updatedAt: 
+                type: string
+                example: 2021-07-08T14:48:22.308Z
+              individual: 
+                type: object
+                properties: 
+                  birthday: 
+                    type: string
+                    example: 1980-05-21T00:00:00.000Z
+                  birthplace: 
+                    type: string
+                    example: Luxembourg
+                  firstName: 
+                    type: string
+                    example: Antonio
+                  gender: 
+                    type: string
+                    example: Male
+                  idNumber: 
+                    type: string
+                    example: 12345678
+                  lastName: 
+                    type: string
+                    example: Pedraza
+                  nationality: 
+                    type: string
+                    example: LIE
+                  occupation: 
+                    type: string
+                    example: Finance
+                  passportNumber: 
+                    type: string
+                    example: 87654321
+                  phone: 
+                    type: string
+                    example: +352 28810201
+                  politicallyExposed: 
+                    type: boolean
+                  buildingNumber: 
+                    type: string
+                    example: 123
+                  street: 
+                    type: string
+                    example: Street
+                  city: 
+                    type: string
+                    example: Luxembourg
+                  country: 
+                    type: string
+                    example: LIE
+                  zipCode: 
+                    type: string
+                    example: 12345
+              institutional: 
+                type: string
+                format: nullable
+        itemsReturned: 
+          type: integer
+          format: int32
+          example: 1
+        totalItemsFound: 
+          type: integer
+          format: int32
+          example: 1
+        totalPagesFound: 
+          type: integer
+          format: int32
+          example: 1
+        firstPageOffset: 
+          type: integer
+          format: int32
+          example: 0
+        lastPageOffset: 
+          type: integer
+          format: int32
+          example: 0
+        currentPage: 
+          type: integer
+          format: int32
+          example: 1
+        previousPageOffset: 
+          type: string
+          format: nullable
+        nextPageOffset: 
+          type: string
+          format: nullable
+
+    TokenyMintValidateRes:
+      type: object
+      properties: 
+        gasEstimation: 
+          type: string
+          example: 
+        transactionData: 
+          type: string
+          example: 0x685731070000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000d37d9e06329111fb2e8b63e7a22142e80c266220000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000000000000000000000000000000000a
+        agentWallet: 
+          type: string
+          format: nullable
+    TokenyMintTokenReq:
+      type: object
+      properties:
+        ethereumNetwork: 
+          type: string
+        transactions: 
+          type: array
+          items: 
+            type: object
+            properties: 
+              address: 
+                type: string
+              amount: 
+                type: string
+    TokenyMintTokenBatchRes:
+      type: object
+      properties:
+        transactionId: 
+          type: string
+        hash: 
+          type: string
+        id: 
+          type: string
+    TokenyCandidates:
+      type: object
+      properties: 
+        items: 
+          type: array
+          items: 
+            type: object
+            properties: 
+              email: 
+                type: string
+              id: 
+                type: string
+              kycProvider: 
+                type: string
+                format: nullable
+              kycStatus: 
+                type: string
+              lastLogin: 
+                type: string
+              createdAt: 
+                type: string
+              name: 
+                type: string
+              currentSection: 
+                type: string
+              status: 
+                type: string
+              investorType: 
+                type: string
+              country: 
+                type: string
+              wallet: 
+                type: string
+                format: nullable
+              walletProvider: 
+                type: string
+                format: nullable
+        itemsReturned: 
+          type: integer
+          format: int32
+        totalItemsFound: 
+          type: integer
+          format: int32
+        totalPagesFound: 
+          type: integer
+          format: int32
+        firstPageOffset: 
+          type: integer
+          format: int32
+        lastPageOffset: 
+          type: integer
+          format: int32
+        currentPage: 
+          type: integer
+          format: int32
+        previousPageOffset: 
+          type: string
+          format: nullable
+        nextPageOffset: 
+          type: string
+          format: nullable
+    TokenyCandidatesOnfidoReq:
+      type: object
+      properties:
+        ethereumNetwork: 
+          type: string
+        identityIds: 
+          type: array
+          items: 
+            type: string
+        wallets: 
+          type: array
+          items: 
+            type: string
     TokenyQualification:
       type: object
       description: >-
@@ -184,8 +711,6 @@ components:
           type: boolean
         instructions: 
           type: string
-
-        
     TokenyData:
       type: object
       properties:
